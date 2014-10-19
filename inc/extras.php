@@ -91,6 +91,8 @@ function nopasera_setup_author() {
 }
 add_action( 'wp', 'nopasera_setup_author' );
 
+add_filter( 'the_excerpt', array( $GLOBALS['embed'], 'autoembed' ), 9 );
+
 function add_link_pages( $content ){
 	$pages = wp_link_pages( 
 		array( 
@@ -104,3 +106,76 @@ function add_link_pages( $content ){
 	return $content . $pages;
 }
 add_filter( 'the_content', 'add_link_pages' );
+
+add_action( 'widgets_init', 'extended_archive_widget' );
+function extended_archive_widget(){
+	register_widget( 'x_archives' );
+}
+
+class x_archives extends WP_Widget
+{
+	function __construct() {
+		$widget_ops = array(
+			'classname'   => 'archives_extended',
+			'description' => 'Extended archives with additional options.'
+			);
+		parent::__construct( 'x_archive_widget', 'Archives', $widget_ops );
+	}
+	
+	function widget( $args, $instance ){
+		extract( $args );
+		$limit = (int)( empty( $instance['limit'] ) ) ? '12' : $instance['limit'];
+		$type  = ( empty( $instance['type'] ) ) ? 'monthly' : $instance['type'];
+		$title = apply_filters('widget_title', empty($instance['title']) ? __('Archives') : $instance['title'], $instance, $this->id_base);
+		
+		$content = wp_get_archives( array(
+			'type'            => $type,
+			'limit'           => $limit,
+			'format'          => 'html', 
+			'before'          => '',
+			'after'           => '',
+			'show_post_count' => false,
+			'echo'            => 0,
+			'order'           => 'DESC'
+			) );
+		
+        $output = $before_widget . $before_title . $title . $after_title . '<ul class="archive">' . $content .'</ul>' . $after_widget;
+        echo $output;
+    }
+        
+    function update( $new_instance, $old_instance ){
+        $instance = $old_instance; 
+        $new_instance = wp_parse_args( (array) $new_instance, array( 'title' => 'Archives', 'type' => '', 'limit' => '') ); 
+        $instance['title'] = $new_instance['title'];
+        $instance['limit'] = $new_instance['limit']; 
+        $instance['type'] = $new_instance['type']; 
+        return $instance; 
+    }
+    
+    function form( $instance ){
+        $instance = wp_parse_args( (array)$instance, array('title', 'limit', 'type') ); 
+        $title = $instance['title']; 
+        $limit = $instance['limit']; 
+        $type = $instance['type']; 
+        $types = array( 
+            'Post' => 'postbypost', 
+            'Daily' => 'daily', 
+            'Weekly' => 'weekly', 
+            'Monthly' => 'monthly' 
+            ); ?> 
+            <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
+            <input id="<?php echo $this->get_field_id('title'); ?>" class="widefat" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /> 
+            <label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e( 'Limit:' ); ?></label>
+            <input id="<?php echo $this->get_field_id('limit'); ?>" class="widefat" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" />
+            <label for="<?php echo $this->get_field_id('type'); ?>"><?php _e( 'Type:' ); ?></label>
+            <select id="<?php echo $this->get_field_id('type'); ?>" name="<?php echo $this->get_field_name('type'); ?>">
+            <?php foreach( $types as $key => $typo ){ 
+            echo '<option value=' . $typo;
+            selected( $type, $typo );
+            echo ">$key</option>";
+            } ?>
+            </select>
+        <?php
+    }
+        
+}

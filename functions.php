@@ -60,9 +60,7 @@ function nopasera_setup() {
 	 * Enable support for Post Formats.
 	 * See http://codex.wordpress.org/Post_Formats
 	 */
-	add_theme_support( 'post-formats', array(
-		'aside', 'image', 'video', 'quote', 'link',
-	) );
+	add_theme_support( 'post-formats', supported_post_formats() );
 
 	// Setup the WordPress core custom background feature.
 	add_theme_support( 'custom-background', apply_filters( 'nopasera_custom_background_args', array(
@@ -72,6 +70,15 @@ function nopasera_setup() {
 }
 endif; // nopasera_setup
 add_action( 'after_setup_theme', 'nopasera_setup' );
+
+function supported_post_formats(){
+    // Core formats as example
+    // $formats = array( 'quote', 'link', 'chat', 'image', 'gallery', 'audio', 'video' );
+    $default = array( 'link', 'image', 'quote' );
+    $formats = wp_parse_args( $default, (array)apply_filters( 'theme_formats', array() ) );
+    
+    return $formats;
+}
 
 /**
  * Register widget area.
@@ -107,14 +114,6 @@ function nopasera_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'nopasera_scripts' );
 
-/**
- * Implement the Custom Header feature.
- */
-//require get_template_directory() . '/inc/custom-header.php';
-
-/**
- * Custom template tags for this theme.
- */
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/custom-header.php';
 
