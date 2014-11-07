@@ -90,8 +90,8 @@ function nopasera_setup_author() {
 	}
 }
 add_action( 'wp', 'nopasera_setup_author' );
-
-add_filter( 'the_excerpt', array( $GLOBALS['embed'], 'autoembed' ), 9 );
+global $wp_embed;
+add_filter( 'the_excerpt', array( $wp_embed, 'autoembed' ), 9 );
 
 function add_link_pages( $content ){
 	$pages = wp_link_pages( 
@@ -106,6 +106,18 @@ function add_link_pages( $content ){
 	return $content . $pages;
 }
 add_filter( 'the_content', 'add_link_pages' );
+
+add_filter( 'the_password_form', 'my_password_form' );
+function my_password_form(){
+    global $post;
+    
+    $form = '
+    <form class="password-form" action="/wp-login.php?action=postpass" method="post">
+    <p>' . __( 'This post is password protected. To read it please enter the password below.' ) . '</p>
+    <input type="password" value="" name="post_password" id="password-' . $post->ID . '"/>
+    </form>';
+    return $form;
+}
 
 add_action( 'widgets_init', 'extended_archive_widget' );
 function extended_archive_widget(){
@@ -124,7 +136,7 @@ class x_archives extends WP_Widget
 	
 	function widget( $args, $instance ){
 		extract( $args );
-		$limit = (int)( empty( $instance['limit'] ) ) ? '12' : $instance['limit'];
+		$limit = ( empty( $instance['limit'] ) ) ? '12' : $instance['limit'];
 		$type  = ( empty( $instance['type'] ) ) ? 'monthly' : $instance['type'];
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Archives') : $instance['title'], $instance, $this->id_base);
 		
@@ -164,9 +176,9 @@ class x_archives extends WP_Widget
             'Monthly' => 'monthly' 
             ); ?> 
             <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
-            <input id="<?php echo $this->get_field_id('title'); ?>" class="widefat" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /> 
+            <input id="<?php echo $this->get_field_id('title'); ?>" class="widefat" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /> 
             <label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e( 'Limit:' ); ?></label>
-            <input id="<?php echo $this->get_field_id('limit'); ?>" class="widefat" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" />
+            <input id="<?php echo $this->get_field_id('limit'); ?>" class="widefat" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>" />
             <label for="<?php echo $this->get_field_id('type'); ?>"><?php _e( 'Type:' ); ?></label>
             <select id="<?php echo $this->get_field_id('type'); ?>" name="<?php echo $this->get_field_name('type'); ?>">
             <?php foreach( $types as $key => $typo ){ 

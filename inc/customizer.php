@@ -18,7 +18,7 @@ function nopasera_customize_register( $wp_customize ) {
 	// Add settings
 	$wp_customize->add_setting( 'max_width', array(
 		'default' => 860,
-		'sanitize_callback' => 'absint'
+		'sanitize_callback' => 'callback_function'
 		) );
     $wp_customize->add_control( 'max_width', array(
         'label' => __( 'Set the max width for the site' ),

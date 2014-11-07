@@ -14,7 +14,10 @@
 <title><?php wp_title( '|', true, 'right' ); ?></title>
 <link rel="profile" href="http://gmpg.org/xfn/11">
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
-
+<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+<!--[if lt IE 9]>
+<script src="<?php echo get_template_directory_uri(); ?>/html5shiv.js"></script>
+<![endif]-->
 <?php wp_head(); ?>
 </head>
 
@@ -29,7 +32,7 @@
 		</div>
 	<?php if ( get_header_image() ): ?>
 	<div class="header-image">
-		<img src="<?php echo( get_header_image() ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'title', 'display' ) ); ?>" />
+		<img src="<?php echo( get_header_image() ); ?>" alt="<?php echo get_bloginfo( 'title', 'display' ); ?>" />
 	</div>
 	<?php endif; ?>
 
@@ -39,6 +42,17 @@
 			<?php wp_nav_menu( array( 'theme_location' => 'primary', 'menu_id' => 'access' ) ); ?>
 		</nav><!-- #site-navigation -->
 		<?php endif; ?>
+		
+		<div class="social">
+		    <?php $options = get_option( 'default_options' );
+            foreach( $options['social'] as $profile => $link ){
+                echo '<span class="social">';
+                echo '<a href="' . $options['social'][$link] . '">' . $profile . '</a>';
+                echo '</span>';
+            }
+            ?>
+		    
+		</div>
 	</header><!-- #masthead -->
 
 	<div id="content" class="site-content">
