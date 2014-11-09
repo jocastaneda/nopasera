@@ -47,7 +47,7 @@
 		    <?php $options = get_option( 'default_options' );
             foreach( $options['social'] as $profile => $link ){
                 echo '<span class="social">';
-                echo '<a href="' . $options['social'][$link] . '">' . $profile . '</a>';
+                echo '<a href="' . $link . '">' . $profile . '</a>';
                 echo '</span>';
             }
             ?>
